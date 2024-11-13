@@ -75,47 +75,56 @@ class ImportedObject:
             print("Loaded " + self.fileName + \
                   ".mtl with " + str(len(self.materials)) + " materials")
 
-    ## Load the object geometry.
-    def loadOBJ(self):
-        ## parse the materials file first so we know when to apply materials
-        ## and textures
-        self.loadMat()
-        numFaces = 0
-        with open((self.fileName + ".obj"), "r") as objFile:
-            # TODO 
-            # read vertices, norms, faces, textcoords from obj file  
-            # self.verts, self.norms, self.faces, self.texCoords                  
-            for line in objFile:
-                ## Break the line into its components
-                vals = line.split()
-                if len(vals) > 0:
-                    ## Load vertices
-                    if vals[0] == "v":  
-                        v = map(float, vals[1:4])  
-                        self.verts.append(v)
-                    ## Load normals
-                    elif vals[0] == "vn":  
-                        # things to do 
-
-                    ## Load texture coordinates
-                    elif vals[0] == "vt":
-                        # things to do 
-                        
-                    ## Load materials. Set index to -1!
-                    elif vals[0] == "usemtl":
-                        m = vals[1]
-                        self.faces.append([-1, m, numFaces])
-                    ## Load the faces
-                    elif vals[0] == "f":
-                        tempFace = []
-                        # things to do 
-                        self.faces.append(tempFace)  
-                             
-        if self.verbose:
-            print("Loaded " + self.fileName + ".obj with " + \
-                  str(len(self.verts)) + " vertices, " + \
-                  str(len(self.norms)) + " normals, and " + \
-                  str(len(self.faces)) + " faces")                
+## Load the object geometry.
+def loadOBJ(self):
+    ## Parse the materials file first so we know when to apply materials
+    ## and textures
+    self.loadMat()
+    numFaces = 0
+    with open((self.fileName + ".obj"), "r") as objFile:
+        # Initialize lists
+        self.verts = []
+        self.norms = []
+        self.texCoords = []
+        self.faces = []
+        
+        for line in objFile:
+            ## Break the line into its components
+            vals = line.split()
+            if len(vals) > 0:
+                ## Load vertices
+                if vals[0] == "v":  
+                    v = list(map(float, vals[1:4]))  
+                    self.verts.append(v)
+                ## Load normals
+                elif vals[0] == "vn":  
+                    n = list(map(float, vals[1:4]))
+                    self.norms.append(n)
+                ## Load texture coordinates
+                elif vals[0] == "vt":
+                    t = list(map(float, vals[1:3]))
+                    self.texCoords.append(t)
+                ## Load materials. Set index to -1!
+                elif vals[0] == "usemtl":
+                    m = vals[1]
+                    self.faces.append([-1, m, numFaces])
+                ## Load the faces
+                elif vals[0] == "f":
+                    tempFace = []
+                    for v in vals[1:]:
+                        w = v.split('/')
+                        vertexIndex = int(w[0]) - 1
+                        textureIndex = int(w[1]) - 1 if len(w) > 1 and w[1] else None
+                        normalIndex = int(w[2]) - 1 if len(w) > 2 and w[2] else None
+                        tempFace.append((vertexIndex, textureIndex, normalIndex))
+                    self.faces.append(tempFace)
+                    numFaces += 1
+                         
+    if self.verbose:
+        print("Loaded " + self.fileName + ".obj with " + \
+              str(len(self.verts)) + " vertices, " + \
+              str(len(self.norms)) + " normals, and " + \
+              str(len(self.faces)) + " faces")                
 
 
     ## Draws the object
