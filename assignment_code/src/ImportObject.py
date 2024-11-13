@@ -18,7 +18,7 @@ class ImportedObject:
         self.texCoords = []
         self.materials = []
         self.fileName = fileName        
-        self.setAmbient = False
+        self.setAmbient = setAmbient
         self.hasTex = False
         ## Set this value to False before loading if the model is flat
         self.isSmooth = True

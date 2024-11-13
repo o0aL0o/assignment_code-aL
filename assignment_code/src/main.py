@@ -449,7 +449,7 @@ def loadTexture(imageName):
 
 def loadSceneTextures():
     global roadTextureID
-    roadTextureID = loadTexture("../img/road2.png")
+    roadTextureID = loadTexture("D:/Computer assiment/assignment_code-aL/assignment_code/img/road2.png")
     
 #-----------------------------------------------lighting work--------------
 def initializeLight():
