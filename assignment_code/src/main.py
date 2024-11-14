@@ -449,7 +449,7 @@ def loadTexture(imageName):
 
 def loadSceneTextures():
     global roadTextureID
-    roadTextureID = loadTexture("D:/Computer assiment/assignment_code-aL/assignment_code/img/road2.png")
+    roadTextureID = loadTexture("./img/road2.png")
     
 #-----------------------------------------------lighting work--------------
 def initializeLight():
@@ -508,13 +508,12 @@ def main():
 
 
     
-     #diamondObj.makeDisplayLists()
+    # diamondObj.makeDisplayLists()
     
     staticObjects()
     if (applyLighting == True):
         initializeLight()
     glutMainLoop()
-    
 
 
 
