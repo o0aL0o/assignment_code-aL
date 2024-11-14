@@ -465,7 +465,16 @@ def initializeLight():
 #menu
 def lightmenu(value):
     if value == 1:
+        ambientLight = [0.2, 0.2, 0.2, 1.0]
+        diffuseLight = [0.9, 0.9, 0.9, 1.0]
+        specularLight = [1.0, 1.0, 1.0, 1.0]
+        lightPosition = [9.0, 9.0, 9.0, 1.0]
         glEnable(GL_LIGHTING)
+        glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight)
+        glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight)
+        glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight)
+        glLightfv(GL_LIGHT1, GL_POSITION, lightPosition)
+        glEnable(GL_LIGHT1)
     elif value == 2:
         glEnable(GL_LIGHT0) 
     elif value == 3:
@@ -502,10 +511,10 @@ def main():
     # things to do
     # add a menu 
     glutCreateMenu(lightmenu)
-    glutAddMenuEntry("1",1)
-    glutAddMenuEntry("2",2)
-    glutAddMenuEntry("3",3)
-    glutAddMenuEntry("4",4)
+    glutAddMenuEntry("ambien",1)
+    glutAddMenuEntry("point lights",2)
+    glutAddMenuEntry("directional lights",3)
+    glutAddMenuEntry("spotlights",4)
     glutAttachMenu(GLUT_RIGHT_BUTTON)
 
     loadSceneTextures()
