@@ -5,7 +5,7 @@ from OpenGL.GLU import *
 import math, time, random, csv, datetime
 import ImportObject
 import PIL.Image as Image
-import jeep, cone
+import jeep, cone, deadtree
 
 windowSize = 600
 helpWindow = False
@@ -28,6 +28,7 @@ objectArray = []
 jeep1Obj = jeep.jeep('p')
 jeep2Obj = jeep.jeep('g')
 jeep3Obj = jeep.jeep('r')
+deadtreeObj = deadtree.DeadTree(10,0,-10)
 
 allJeeps = [jeep1Obj, jeep2Obj, jeep3Obj]
 jeepNum = 0
@@ -141,7 +142,7 @@ def staticObjects():
 
 
 def display():
-    global jeepObj, canStart, score, beginTime, countTime
+    global jeepObj, canStart, score, beginTime, countTime, deadtreeObj
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     if (applyLighting == True):
@@ -211,6 +212,8 @@ def display():
     jeepObj.drawW1()
     jeepObj.drawW2()
     jeepObj.drawLight()
+
+    deadtreeObj.draw()
     #personObj.draw()
     glutSwapBuffers()
 
@@ -493,6 +496,7 @@ def main():
     jeep1Obj.makeDisplayLists()
     jeep2Obj.makeDisplayLists()
     jeep3Obj.makeDisplayLists()
+    deadtreeObj.makeDisplayLists()
     #personObj.makeDisplayLists()
 
     # things to do
