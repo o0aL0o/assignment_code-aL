@@ -462,6 +462,17 @@ def initializeLight():
     glEnable(GL_NORMALIZE)               
     glClearColor(0.1, 0.1, 0.1, 0.0)
 
+#menu
+def lightmenu(value):
+    if value == 1:
+        glEnable(GL_LIGHTING)
+    elif value == 2:
+        glEnable(GL_LIGHT0) 
+    elif value == 3:
+        glEnable(GL_DEPTH_TEST) 
+    elif value == 4:
+        glEnable(GL_NORMALIZE) 
+
 #~~~~~~~~~~~~~~~~~~~~~~~~~the finale!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
     glutInit()
@@ -490,6 +501,12 @@ def main():
     glutReshapeFunc(noReshape)
     # things to do
     # add a menu 
+    glutCreateMenu(lightmenu)
+    glutAddMenuEntry("1",1)
+    glutAddMenuEntry("2",2)
+    glutAddMenuEntry("3",3)
+    glutAddMenuEntry("4",4)
+    glutAttachMenu(GLUT_RIGHT_BUTTON)
 
     loadSceneTextures()
 
