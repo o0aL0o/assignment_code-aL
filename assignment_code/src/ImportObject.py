@@ -82,7 +82,7 @@ class ImportedObject:
         self.loadMat()
         numFaces = 0
         with open((self.fileName + ".obj"), "r") as objFile:
-            # TODO 
+            #TODo 
             # read vertices, norms, faces, textcoords from obj file  
             # self.verts, self.norms, self.faces, self.texCoords                  
             for line in objFile:
@@ -91,15 +91,17 @@ class ImportedObject:
                 if len(vals) > 0:
                     ## Load vertices
                     if vals[0] == "v":  
-                        v = map(float, vals[1:4])  
+                        v = list(map(float, vals[1:4]))
                         self.verts.append(v)
                     ## Load normals
                     elif vals[0] == "vn":  
-                        # things to do 
+                        n = list(map(float, vals[1:4]))
+                        self.norms.append(n)
 
                     ## Load texture coordinates
                     elif vals[0] == "vt":
-                        # things to do 
+                        t = list(map(float, vals[1:3]))
+                        self.texCoords.append(t) 
                         
                     ## Load materials. Set index to -1!
                     elif vals[0] == "usemtl":
@@ -108,7 +110,10 @@ class ImportedObject:
                     ## Load the faces
                     elif vals[0] == "f":
                         tempFace = []
-                        # things to do 
+                        for f in vals[1:]:
+                            w = f.split('/')
+                            face = [int(i) - 1 if i else -1 for i in w]
+                            tempFace.append(face)
                         self.faces.append(tempFace)  
                              
         if self.verbose:
