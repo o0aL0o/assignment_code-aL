@@ -69,7 +69,7 @@ rewardCoord = []
 ckSense = 5.0
 
 #concerned with lighting#########################!!!!!!!!!!!!!!!!##########
-applyLighting = False
+applyLighting = True
 
 fov = 30.0
 attenuation = 1.0
@@ -455,33 +455,49 @@ def loadSceneTextures():
     roadTextureID = loadTexture("./img/road2.png")
     
 #-----------------------------------------------lighting work--------------
+# Define light properties
+ambient_light = [0.2, 0.2, 0.2, 1.0]
+point_light_position = [1.0, 1.0, 1.0, 1.0]
+directional_light_direction = [0.0, -1.0, -1.0, 0.0]
+spot_light_position = [0.0, 5.0, 0.0, 1.0]
+spot_light_direction = [0.0, -1.0, 0.0]
+
+def set_ambient_light():
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light)
+    glDisable(GL_LIGHT1)
+
+def set_point_light():
+    glLightfv(GL_LIGHT0, GL_POSITION, point_light_position)
+    glEnable(GL_LIGHT1)
+
+def set_directional_light():
+    glLightfv(GL_LIGHT0, GL_POSITION, directional_light_direction)
+    glDisable(GL_LIGHT1)
+
+def set_spot_light():
+    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0)
+    glLightfv(GL_LIGHT0, GL_POSITION, spot_light_position)
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_light_direction)
+    glEnable(GL_LIGHT1)
+
+#menu
+def lightmenu(value):
+    if value == 1:
+        set_ambient_light()
+    elif value == 2:
+        set_point_light()
+    elif value == 3:
+        set_directional_light()
+    elif value == 4:
+        set_spot_light()
+    glutPostRedisplay()
+
 def initializeLight():
     glEnable(GL_LIGHTING)                
     glEnable(GL_LIGHT0)                 
     glEnable(GL_DEPTH_TEST)              
     glEnable(GL_NORMALIZE)               
     glClearColor(0.1, 0.1, 0.1, 0.0)
-
-#menu
-def lightmenu(value):
-    if value == 1:
-        ambientLight = [0.2, 0.2, 0.2, 1.0]
-        diffuseLight = [0.9, 0.9, 0.9, 1.0]
-        specularLight = [1.0, 1.0, 1.0, 1.0]
-        lightPosition = [9.0, 9.0, 9.0, 1.0]
-        glEnable(GL_LIGHTING)
-        glLightfv(GL_LIGHT1, GL_AMBIENT, ambientLight)
-        glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuseLight)
-        glLightfv(GL_LIGHT1, GL_SPECULAR, specularLight)
-        glLightfv(GL_LIGHT1, GL_POSITION, lightPosition)
-        glEnable(GL_LIGHT1)
-    elif value == 2:
-        glEnable(GL_LIGHT0) 
-    elif value == 3:
-        glEnable(GL_DEPTH_TEST) 
-    elif value == 4:
-        glEnable(GL_NORMALIZE) 
-
 #~~~~~~~~~~~~~~~~~~~~~~~~~the finale!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
     glutInit()
@@ -511,10 +527,10 @@ def main():
     # things to do
     # add a menu 
     glutCreateMenu(lightmenu)
-    glutAddMenuEntry("ambien",1)
-    glutAddMenuEntry("point lights",2)
-    glutAddMenuEntry("directional lights",3)
-    glutAddMenuEntry("spotlights",4)
+    glutAddMenuEntry("Ambient Light", 1)
+    glutAddMenuEntry("Point Lights", 2)
+    glutAddMenuEntry("Directional Lights", 3)
+    glutAddMenuEntry("Spotlights", 4)
     glutAttachMenu(GLUT_RIGHT_BUTTON)
 
     loadSceneTextures()
