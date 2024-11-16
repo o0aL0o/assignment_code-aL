@@ -11,7 +11,7 @@ windowSize = 600
 helpWindow = False
 helpWin = 0
 mainWin = 0
-centered = False
+centered = True
 
 beginTime = 0
 countTime = 0
@@ -220,6 +220,7 @@ def display():
 def idle():#--------------with more complex display items like turning wheel---
     global tickTime, prevTime, score
     jeepObj.rotateWheel(-0.1 * tickTime)    
+    # updateCamera()
     glutPostRedisplay()
     
     curTime = glutGet(GLUT_ELAPSED_TIME)
@@ -242,13 +243,33 @@ def setView():
         gluLookAt(eyeX, eyeY, eyeZ, 0, 0, 0, 0, 1, 0)
     glMatrixMode(GL_MODELVIEW)
     
-    glutPostRedisplay()    
+    glutPostRedisplay()   
+
+# camera_distance = 10.0
+# camera_angle = 0.0
+# camera_height = 2.0
+# zoom_speed = 0.5
+# angle_speed = 0.0001
+
+# def updateCamera():
+#     global eyeX, eyeY, eyeZ, camera_angle, camera_distance
+#     # Calculate camera position based on angle and distance
+#     eyeX = jeepObj.posX + camera_distance * math.sin(camera_angle)
+#     eyeY = jeepObj.posY + camera_height
+#     eyeZ = jeepObj.posZ + camera_distance * math.cos(camera_angle) 
 
 def setObjView():
     # things to do
     # realize a view following the jeep
     # refer to setview
-    pass
+    global eyeX, eyeY, eyeZ
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(90, 1, 0.1, 100)
+    # Set camera to follow the jeep
+    gluLookAt(eyeX, eyeY, eyeZ, jeepObj.posX, jeepObj.posY, jeepObj.posZ, 0, 1, 0)
+    glMatrixMode(GL_MODELVIEW)
+    glutPostRedisplay()
 
 #-------------------------------------------user inputs------------------
 def mouseHandle(button, state, x, y):
@@ -260,6 +281,16 @@ def mouseHandle(button, state, x, y):
         midDown = False    
         
 def motionHandle(x,y):
+    # global camera_angle, camera_distance
+    # if midDown:
+    #     # Adjust camera angle and distance based on mouse movement
+    #     dx = x - windowSize / 2
+    #     dy = y - windowSize / 2
+    #     camera_angle += dx * angle_speed
+    #     camera_distance -= dy * zoom_speed
+    #     camera_distance = max(5.0, min(20.0, camera_distance))  # Limit zoom
+    #     updateCamera()
+    #     setObjView()
     global nowX, nowY, angle, eyeX, eyeY, eyeZ, phi
     if (midDown == True):
         pastX = nowX
@@ -270,13 +301,13 @@ def motionHandle(x,y):
             angle -= 0.25
         elif (nowX - pastX < 0):
             angle += 0.25
-        #elif (nowY - pastY > 0): look into looking over and under object...
-            #phi += 1.0
-        #elif (nowX - pastY <0):
-            #phi -= 1.0
+        elif (nowY - pastY > 0): #look into looking over and under object...
+            phi += 1.0
+        elif (nowX - pastY <0):
+            phi -= 1.0
         eyeX = radius * math.sin(angle) 
         eyeZ = radius * math.cos(angle)
-        #eyeY = radius * math.sin(phi)
+        eyeY = radius * math.sin(phi)
     if centered == False:
         setView()
     elif centered == True:
@@ -289,7 +320,20 @@ def motionHandle(x,y):
 def specialKeys(keypress, mX, mY):
     # things to do
     # this is the function to move the car
-    pass
+    global jeepObj
+    move_speed = 0.5  # Adjust the speed as needed
+
+    if keypress == GLUT_KEY_UP or keypress == b'w':  # Forward
+        jeepObj.posZ += move_speed
+    elif keypress == GLUT_KEY_DOWN or keypress == b's':  # Backward
+        jeepObj.posZ -= move_speed
+    elif keypress == GLUT_KEY_LEFT or keypress == b'a':  # Left
+        jeepObj.posX += move_speed
+    elif keypress == GLUT_KEY_RIGHT or keypress == b'd':  # Right
+        jeepObj.posX -= move_speed
+
+    collisionCheck()  # Check for collisions after moving
+    glutPostRedisplay()
 
 def myKeyboard(key, mX, mY):
     global eyeX, eyeY, eyeZ, angle, radius, helpWindow, centered, helpWin, overReason, topView, behindView
@@ -311,6 +355,8 @@ def myKeyboard(key, mX, mY):
             glutHideWindow()
             #glutDestroyWindow(helpWin)
             glutMainLoop()
+    elif key in [b'w', b'a', b's', b'd']:
+        specialKeys(key, mX, mY)  # Call specialKeys for WASD
     # things can do
     # this is the part to set special functions, such as help window.
 
@@ -350,10 +396,10 @@ def collisionCheck():
         overReason = "You ran off the road!"
         gameOver()
 
-    if (dist((jeepObj.posX, jeepObj.posZ), (diamondObj.posX, diamondObj.posZ)) <= ckSense and usedDiamond ==False):
-        print ("Diamond bonus!")
-        countTime /= 2
-        usedDiamond = True
+    # if (dist((jeepObj.posX, jeepObj.posZ), (diamondObj.posX, diamondObj.posZ)) <= ckSense and usedDiamond ==False):
+    #     print ("Diamond bonus!")
+    #     countTime /= 2
+    #     usedDiamond = True
     if (jeepObj.posZ >= land*gameEnlarge):
         gameSuccess()
         
