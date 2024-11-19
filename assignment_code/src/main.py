@@ -85,6 +85,40 @@ matDiffuse = [0.5, 0.5, 0.5, 1.0]
 matSpecular = [0.5, 0.5, 0.5, 1.0]
 matShininess  = 100.0
 
+class MovingCone:
+    def __init__(self, x, z):
+        self.x = x
+        self.z = z
+        self.direction = random.choice([0, 90, 180, 270])  # Initial direction in degrees
+        self.speed = 0.05  # Speed of movement
+
+    def update_position(self):
+        # Move in the direction the cone is facing
+        self.x += self.speed * math.cos(math.radians(self.direction))
+        self.z += self.speed * math.sin(math.radians(self.direction))
+
+        # Change direction randomly to simulate reaction to environment
+        if random.random() < 0.05:  # 5% chance to change direction
+            self.direction += random.choice([-90, 90])
+
+        # Keep the cone within bounds
+        self.x = max(-land, min(land, self.x))
+        self.z = max(-land, min(land * gameEnlarge, self.z))
+        
+    def draw(self):
+        glPushMatrix()
+        glTranslatef(self.x, 0, self.z)
+        glRotatef(-90, 1, 0, 0)
+        glutSolidCone(1, 2, 20, 20)  # Draw the cone
+        glPopMatrix()
+
+# Initialize moving cones
+moving_cones = [MovingCone(random.randint(-land, land), random.randint(10, land * gameEnlarge)) for _ in range(coneAmount)]
+
+def update_cones():
+    for cone in moving_cones:
+        cone.update_position()
+
 
 
 #--------------------------------------developing scene---------------
@@ -207,6 +241,10 @@ def display():
 
     # if (usedDiamond == False):
     #     diamondObj.draw()
+
+    update_cones()
+    for cone in moving_cones:
+        cone.draw()
     
     jeepObj.draw()
     jeepObj.drawW1()
@@ -279,7 +317,7 @@ def mouseHandle(button, state, x, y):
         print ('pushed')
     else:
         midDown = False    
-        
+
 def motionHandle(x,y):
     # global camera_angle, camera_distance
     # if midDown:
@@ -298,13 +336,13 @@ def motionHandle(x,y):
         nowX = x
         nowY = y
         if (nowX - pastX > 0):
-            angle -= 0.25
+            angle -= 0.025
         elif (nowX - pastX < 0):
-            angle += 0.25
+            angle += 0.025
         elif (nowY - pastY > 0): #look into looking over and under object...
-            phi += 1.0
+            phi += 0.025
         elif (nowX - pastY <0):
-            phi -= 1.0
+            phi -= 0.025
         eyeX = radius * math.sin(angle) 
         eyeZ = radius * math.cos(angle)
         eyeY = radius * math.sin(phi)
@@ -333,6 +371,7 @@ def specialKeys(keypress, mX, mY):
         jeepObj.posX -= move_speed
 
     collisionCheck()  # Check for collisions after moving
+    setObjView()
     glutPostRedisplay()
 
 def myKeyboard(key, mX, mY):
