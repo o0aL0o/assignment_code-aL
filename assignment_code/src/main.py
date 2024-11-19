@@ -420,6 +420,13 @@ def dist(pt1, pt2):
 def noReshape(newX, newY): #used to ensure program works correctly when resized
     glutReshapeWindow(windowSize,windowSize)
 
+def reshape(width, height):
+    glViewport(0, 0, width, height)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    gluPerspective(90, float(width) / float(height), 0.1, 100)
+    glMatrixMode(GL_MODELVIEW)
+
 #--------------------------------------------making game more complex--------
 def addCone(x,z):
     allcones.append(cone.cone(x,z))
@@ -575,6 +582,14 @@ def lightmenu(value):
         set_directional_light()
     elif value == 4:
         set_spot_light()
+    elif value == 5:
+        set_resolution(800, 600)
+    elif value == 6:
+        set_resolution(1024, 768)
+    elif value == 7:
+        set_resolution(1280, 720)
+    elif value == 8:
+        toggle_fullscreen()
     glutPostRedisplay()
 
 def initializeLight():
@@ -583,6 +598,20 @@ def initializeLight():
     glEnable(GL_DEPTH_TEST)              
     glEnable(GL_NORMALIZE)               
     glClearColor(0.1, 0.1, 0.1, 0.0)
+
+def set_resolution(width, height):
+    glutReshapeWindow(width, height)
+
+is_full = False
+
+def toggle_fullscreen():
+    global is_full
+    if is_full:
+        glutReshapeWindow(windowSize, windowSize)
+        is_full = False
+    else:
+        glutFullScreen()
+        is_full = True
 #~~~~~~~~~~~~~~~~~~~~~~~~~the finale!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
     glutInit()
@@ -608,7 +637,7 @@ def main():
     glutMotionFunc(motionHandle)
     glutSpecialFunc(specialKeys)
     glutKeyboardFunc(myKeyboard)
-    glutReshapeFunc(noReshape)
+    glutReshapeFunc(reshape)
     # things to do
     # add a menu 
     glutCreateMenu(lightmenu)
@@ -616,6 +645,10 @@ def main():
     glutAddMenuEntry("Point Lights", 2)
     glutAddMenuEntry("Directional Lights", 3)
     glutAddMenuEntry("Spotlights", 4)
+    glutAddMenuEntry("800x600", 5)
+    glutAddMenuEntry("1024x768", 6)
+    glutAddMenuEntry("1280x720", 7)
+    glutAddMenuEntry("fullscreen on/off", 8)
     glutAttachMenu(GLUT_RIGHT_BUTTON)
 
     loadSceneTextures()
