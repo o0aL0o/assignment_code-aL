@@ -52,7 +52,7 @@ radius = 10.0
 phi = 0.0
 
 #concerned with scene development
-land = 20
+land = 40
 gameEnlarge = 10
 
 #concerned with obstacles (cones) & rewards (stars)
@@ -84,6 +84,33 @@ matAmbient = [1.0, 1.0, 1.0, 1.0]
 matDiffuse = [0.5, 0.5, 0.5, 1.0]
 matSpecular = [0.5, 0.5, 0.5, 1.0]
 matShininess  = 100.0
+
+class AcceleratingRibbon:
+    def __init__(self, x, z, width, length):
+        self.x = x  # Center position of the ribbon on the X-axis
+        self.z = z  # Center position of the ribbon on the Z-axis
+        self.width = width
+        self.length = length
+
+    def draw(self):
+        glPushMatrix()
+        glColor3f(1.0, 0.0, 0.0)  # Red color for the ribbon
+        glBegin(GL_QUADS)
+        glVertex3f(self.x - self.width / 2, 0.01, self.z - self.length / 2)  # Bottom-left corner
+        glVertex3f(self.x + self.width / 2, 0.01, self.z - self.length / 2)  # Bottom-right corner
+        glVertex3f(self.x + self.width / 2, 0.01, self.z + self.length / 2)  # Top-right corner
+        glVertex3f(self.x - self.width / 2, 0.01, self.z + self.length / 2)  # Top-left corner
+        glEnd()
+        glPopMatrix()
+
+    def is_jeep_on_ribbon(self, jeep_obj):
+        # Check if the jeep's position is within the bounds of the ribbon
+        return (
+            self.x - self.width / 2 <= jeep_obj.posX <= self.x + self.width / 2 and
+            self.z - self.length / 2 <= jeep_obj.posZ <= self.z + self.length / 2
+        )
+
+ribbon = AcceleratingRibbon(0, 20, 5, 10)
 
 class MovingCone:
     def __init__(self, x, z):
@@ -239,6 +266,8 @@ def display():
     for cone in allcones:
         cone.draw()
 
+    ribbon.draw()
+
     # if (usedDiamond == False):
     #     diamondObj.draw()
 
@@ -256,7 +285,7 @@ def display():
     glutSwapBuffers()
 
 def idle():#--------------with more complex display items like turning wheel---
-    global tickTime, prevTime, score
+    global tickTime, prevTime, score, jeepObj, ribbon
     jeepObj.rotateWheel(-0.1 * tickTime)    
     # updateCamera()
     glutPostRedisplay()
@@ -265,6 +294,12 @@ def idle():#--------------with more complex display items like turning wheel---
     tickTime =  curTime - prevTime
     prevTime = curTime
     score = curTime/1000
+
+    # Check if the jeep is on the ribbon
+    if ribbon.is_jeep_on_ribbon(jeepObj):
+        jeepObj.speed = 1.0  # Accelerate the jeep (you can adjust the speed value)
+    else:
+        jeepObj.speed = 0.5  # Default speed
     
 
 #---------------------------------setting camera----------------------------
@@ -359,7 +394,7 @@ def specialKeys(keypress, mX, mY):
     # things to do
     # this is the function to move the car
     global jeepObj
-    move_speed = 0.5  # Adjust the speed as needed
+    move_speed = jeepObj.speed  # Use the jeep's current speed
 
     if keypress == GLUT_KEY_UP or keypress == b'w':  # Forward
         jeepObj.posZ += move_speed
@@ -367,11 +402,13 @@ def specialKeys(keypress, mX, mY):
         jeepObj.posZ -= move_speed
     elif keypress == GLUT_KEY_LEFT or keypress == b'a':  # Left
         jeepObj.posX += move_speed
+        # jeepObj.angle += 5  # Adjust angle for left turn
     elif keypress == GLUT_KEY_RIGHT or keypress == b'd':  # Right
         jeepObj.posX -= move_speed
+        # jeepObj.angle -= 5  # Adjust angle for right turn
 
     collisionCheck()  # Check for collisions after moving
-    setObjView()
+    setObjView()  # Update the camera view
     glutPostRedisplay()
 
 def myKeyboard(key, mX, mY):
