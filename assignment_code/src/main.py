@@ -7,6 +7,14 @@ import ImportObject
 import PIL.Image as Image
 import jeep, cone, deadtree
 
+# Animation variables
+animation_textures = []  # To store loaded textures
+animation_frame = 0  # Current frame to be displayed
+animation_active = False  # Is animation currently active?
+animation_start_time = 0  # When the animation started
+collision_position = (0, 0)  # Position of the collision
+animation_duration = 0.5  # Total duration of animation (in seconds)
+
 windowSize = 600
 helpWindow = False
 helpWin = 0
@@ -85,6 +93,14 @@ matDiffuse = [0.5, 0.5, 0.5, 1.0]
 matSpecular = [0.5, 0.5, 0.5, 1.0]
 matShininess  = 100.0
 
+def load_animation_textures():
+    global animation_textures
+
+    texture_files = ["./img/f1.jpg", "./img/f2.jpg", "./img/f3.jpg", "./img/f4.jpg", "./img/f5.jpg", "./img/f6.jpg", "./img/f7.jpg", "./img/f8.jpg", "./img/f9.jpg"]
+    for file in texture_files:
+        texture_id = loadTexture(file)
+        animation_textures.append(texture_id)
+
 class AcceleratingRibbon:
     def __init__(self, x, z, width, length):
         self.x = x  # Center position of the ribbon on the X-axis
@@ -147,19 +163,67 @@ def update_cones():
         cone.update_position()
 
 def collisionCheckMovingCones():
-    global moving_cones
+    global moving_cones, animation_active, collision_position, animation_start_time
     cones_to_remove = []
 
     for cone in moving_cones:
         # Calculate the distance between the jeep and the cone
         distance = dist((jeepObj.posX, jeepObj.posZ), (cone.x, cone.z))
-        if distance <= ckSense:  # Assuming ckSense is the collision radius
-            cones_to_remove.append(cone)  # Mark the cone for removal
+        if distance <= ckSense:  # If collision detected
+            cones_to_remove.append(cone)
             print("Collision detected with a moving cone!")
-    
+            
+            # Trigger animation
+            if not animation_active:
+                animation_active = True
+                animation_start_time = glutGet(GLUT_ELAPSED_TIME) / 1000.0  # Get current time in seconds
+                collision_position = (cone.x, cone.z)  # Set the collision position
+
     # Remove all collided cones
     for cone in cones_to_remove:
         moving_cones.remove(cone)
+
+def render_animation():
+    global animation_frame, animation_active, animation_start_time
+    if not animation_active:
+        return  # Do nothing if animation is not active
+
+    # Calculate the elapsed time since the animation started
+    current_time = glutGet(GLUT_ELAPSED_TIME) / 1000.0
+    elapsed_time = current_time - animation_start_time
+
+    # Determine the current frame based on elapsed time
+    num_frames = len(animation_textures)
+    frame_duration = animation_duration / num_frames
+    animation_frame = int(elapsed_time / frame_duration)
+
+    if animation_frame >= num_frames:
+        # Animation is complete
+        animation_active = False
+        return
+
+    # Bind the current frame's texture
+    glBindTexture(GL_TEXTURE_2D, animation_textures[animation_frame])
+
+    # Render a quad at the collision position
+    x, z = collision_position
+    size = 20.0  # Size of the animation quad
+    glPushMatrix()
+    glTranslatef(x, 1, z) 
+    glRotatef(-90, 1, 0, 0)
+    glEnable(GL_TEXTURE_2D)
+    glBegin(GL_QUADS)
+    glTexCoord2f(0, 0)
+    glVertex3f(-size / 2, 0, -size / 2)
+    glTexCoord2f(1, 0)
+    glVertex3f(size / 2, 0, -size / 2)
+    glTexCoord2f(1, 1)
+    glVertex3f(size / 2, 0, size / 2)
+    glTexCoord2f(0, 1)
+    glVertex3f(-size / 2, 0, size / 2)
+    glEnd()
+    glDisable(GL_TEXTURE_2D)
+    glPopMatrix()
 
 
 
@@ -296,6 +360,8 @@ def display():
     jeepObj.drawLight()
 
     deadtreeObj.draw()
+
+    render_animation()
     #personObj.draw()
     glutSwapBuffers()
 
@@ -420,13 +486,17 @@ def specialKeys(keypress, mX, mY):
 
     if keypress == GLUT_KEY_UP or keypress == b'w':  # Forward
         jeepObj.posZ += move_speed
+        jeepObj.wheelDir = 'fwd'
     elif keypress == GLUT_KEY_DOWN or keypress == b's':  # Backward
         jeepObj.posZ -= move_speed
+        jeepObj.wheelDir = 'back'
     elif keypress == GLUT_KEY_LEFT or keypress == b'a':  # Left
         jeepObj.posX += move_speed
+        jeepObj.wheelDir = 'fwd'
         # jeepObj.angle += 5  # Adjust angle for left turn
     elif keypress == GLUT_KEY_RIGHT or keypress == b'd':  # Right
         jeepObj.posX -= move_speed
+        jeepObj.wheelDir = 'fwd'
         # jeepObj.angle -= 5  # Adjust angle for right turn
 
     collisionCheck()  # Check for collisions after moving
@@ -720,6 +790,8 @@ def main():
     glutAttachMenu(GLUT_RIGHT_BUTTON)
 
     loadSceneTextures()
+
+    load_animation_textures()
 
     jeep1Obj.makeDisplayLists()
     jeep2Obj.makeDisplayLists()
