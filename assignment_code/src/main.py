@@ -56,7 +56,7 @@ land = 40
 gameEnlarge = 10
 
 #concerned with obstacles (cones) & rewards (stars)
-coneAmount = 15
+coneAmount = 150
 starAmount = 5 #val = -10 pts
 diamondAmount = 1 #val = deducts entire by 1/2
 # diamondObj = diamond.diamond(random.randint(-land, land), random.randint(10.0, land*gameEnlarge))
@@ -110,7 +110,7 @@ class AcceleratingRibbon:
             self.z - self.length / 2 <= jeep_obj.posZ <= self.z + self.length / 2
         )
 
-ribbon = AcceleratingRibbon(0, 20, 5, 10)
+ribbon = AcceleratingRibbon(0, 20, 100, 50)
 
 class MovingCone:
     def __init__(self, x, z):
@@ -145,6 +145,21 @@ moving_cones = [MovingCone(random.randint(-land, land), random.randint(10, land 
 def update_cones():
     for cone in moving_cones:
         cone.update_position()
+
+def collisionCheckMovingCones():
+    global moving_cones
+    cones_to_remove = []
+
+    for cone in moving_cones:
+        # Calculate the distance between the jeep and the cone
+        distance = dist((jeepObj.posX, jeepObj.posZ), (cone.x, cone.z))
+        if distance <= ckSense:  # Assuming ckSense is the collision radius
+            cones_to_remove.append(cone)  # Mark the cone for removal
+            print("Collision detected with a moving cone!")
+    
+    # Remove all collided cones
+    for cone in cones_to_remove:
+        moving_cones.remove(cone)
 
 
 
@@ -297,9 +312,16 @@ def idle():#--------------with more complex display items like turning wheel---
 
     # Check if the jeep is on the ribbon
     if ribbon.is_jeep_on_ribbon(jeepObj):
-        jeepObj.speed = 1.0  # Accelerate the jeep (you can adjust the speed value)
+        jeepObj.speed = 2.0  # Accelerate the jeep (you can adjust the speed value)
     else:
         jeepObj.speed = 0.5  # Default speed
+
+    # Update positions of moving cones
+    update_cones()
+
+    # Check for collisions with moving cones
+    collisionCheckMovingCones()
+
     
 
 #---------------------------------setting camera----------------------------
@@ -457,11 +479,20 @@ def dist(pt1, pt2):
 def noReshape(newX, newY): #used to ensure program works correctly when resized
     glutReshapeWindow(windowSize,windowSize)
 
+aspect_ratio = 1.0  # Global variable for the aspect ratio
+
 def reshape(width, height):
-    glViewport(0, 0, width, height)
+    global aspect_ratio
+    if height == 0:  # Prevent division by zero
+        height = 1
+    aspect_ratio = width / height  # Update the aspect ratio
+
+    glViewport(0, 0, width, height)  # Set the viewport to match the new window size
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    gluPerspective(90, float(width) / float(height), 0.1, 100)
+
+    # Maintain the same field of view and adjust the aspect ratio
+    gluPerspective(60, aspect_ratio, 0.1, 100.0)  # 60-degree FOV, dynamic aspect ratio
     glMatrixMode(GL_MODELVIEW)
 
 #--------------------------------------------making game more complex--------
@@ -609,6 +640,20 @@ def set_spot_light():
     glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_light_direction)
     glEnable(GL_LIGHT1)
 
+def set_resolution(width, height):
+    glutReshapeWindow(width, height)
+
+is_full = False
+
+def toggle_fullscreen():
+    global is_full
+    if is_full:
+        glutReshapeWindow(windowSize, windowSize)
+        is_full = False
+    else:
+        glutFullScreen()
+        is_full = True
+        
 #menu
 def lightmenu(value):
     if value == 1:
@@ -635,20 +680,6 @@ def initializeLight():
     glEnable(GL_DEPTH_TEST)              
     glEnable(GL_NORMALIZE)               
     glClearColor(0.1, 0.1, 0.1, 0.0)
-
-def set_resolution(width, height):
-    glutReshapeWindow(width, height)
-
-is_full = False
-
-def toggle_fullscreen():
-    global is_full
-    if is_full:
-        glutReshapeWindow(windowSize, windowSize)
-        is_full = False
-    else:
-        glutFullScreen()
-        is_full = True
 #~~~~~~~~~~~~~~~~~~~~~~~~~the finale!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def main():
     glutInit()
