@@ -7,6 +7,10 @@ import ImportObject
 import PIL.Image as Image
 import jeep, cone, deadtree
 
+# List to hold all dead trees
+all_deadtrees = []
+treeamount = 30
+
 # Animation variables
 animation_textures = []  # To store loaded textures
 animation_frame = 0  # Current frame to be displayed
@@ -132,7 +136,7 @@ class MovingCone:
     def __init__(self, x, z):
         self.x = x
         self.z = z
-        self.direction = random.choice([0, 90, 180, 270])  # Initial direction in degrees
+        self.direction = random.choice([0, 90, 180, 270])  # degrees
         self.speed = 0.05  # Speed of movement
 
     def update_position(self):
@@ -140,8 +144,8 @@ class MovingCone:
         self.x += self.speed * math.cos(math.radians(self.direction))
         self.z += self.speed * math.sin(math.radians(self.direction))
 
-        # Change direction randomly to simulate reaction to environment
-        if random.random() < 0.05:  # 5% chance to change direction
+        # Change randomly
+        if random.random() < 0.05: 
             self.direction += random.choice([-90, 90])
 
         # Keep the cone within bounds
@@ -167,9 +171,9 @@ def collisionCheckMovingCones():
     cones_to_remove = []
 
     for cone in moving_cones:
-        # Calculate the distance between the jeep and the cone
+        # Calculate  distance between jeep and cone
         distance = dist((jeepObj.posX, jeepObj.posZ), (cone.x, cone.z))
-        if distance <= ckSense:  # If collision detected
+        if distance <= ckSense:  # If collision
             cones_to_remove.append(cone)
             print("Collision detected with a moving cone!")
             
@@ -188,11 +192,10 @@ def render_animation():
     if not animation_active:
         return  # Do nothing if animation is not active
 
-    # Calculate the elapsed time since the animation started
+    # Calculate the elapsed time
     current_time = glutGet(GLUT_ELAPSED_TIME) / 1000.0
     elapsed_time = current_time - animation_start_time
 
-    # Determine the current frame based on elapsed time
     num_frames = len(animation_textures)
     frame_duration = animation_duration / num_frames
     animation_frame = int(elapsed_time / frame_duration)
@@ -202,12 +205,10 @@ def render_animation():
         animation_active = False
         return
 
-    # Bind the current frame's texture
     glBindTexture(GL_TEXTURE_2D, animation_textures[animation_frame])
 
-    # Render a quad at the collision position
     x, z = collision_position
-    size = 20.0  # Size of the animation quad
+    size = 20.0 
     glPushMatrix()
     glTranslatef(x, 1, z) 
     glRotatef(-90, 1, 0, 0)
@@ -344,6 +345,9 @@ def display():
         obj.draw()
     for cone in allcones:
         cone.draw()
+
+    for tree in all_deadtrees:
+        tree.draw()
 
     ribbon.draw()
 
@@ -569,6 +573,9 @@ def reshape(width, height):
 def addCone(x,z):
     allcones.append(cone.cone(x,z))
     obstacleCoord.append((x,z))
+
+def addDeadTree(x,y,z):
+    all_deadtrees.append(deadtree.DeadTree(x,y,z))
 
 def collisionCheck():
     global overReason, score, usedDiamond, countTime
@@ -804,11 +811,17 @@ def main():
     for i in range(coneAmount):#create cones randomly for obstacles, making sure to give a little lag time in beginning by adding 10.0 buffer
         addCone(random.randint(-land, land), random.randint(10.0, land*gameEnlarge))
 
+    for i in range(treeamount):#create cones randomly for obstacles, making sure to give a little lag time in beginning by adding 10.0 buffer
+        addDeadTree(random.randint(-land - land, land + land), 0,random.randint(0, land * gameEnlarge))
+
     # things to do
     # add stars
 
     for cone in allcones:
         cone.makeDisplayLists()
+
+    for tree in all_deadtrees:
+        tree.makeDisplayLists()
 
 
     
