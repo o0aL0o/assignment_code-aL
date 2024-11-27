@@ -9,7 +9,7 @@ import jeep, cone, deadtree , trafficlight
 
 # List to hold all dead trees
 all_deadtrees = []
-treeamount = 30
+treeamount = 100
 
 # Animation variables
 animation_textures = []  # To store loaded textures
@@ -41,7 +41,7 @@ objectArray = []
 jeep1Obj = jeep.jeep('p')
 jeep2Obj = jeep.jeep('g')
 jeep3Obj = jeep.jeep('r')
-deadtreeObj = deadtree.DeadTree(10,0,-10)
+deadtreeObj = deadtree.DeadTree(10,0,-100)
 
 allJeeps = [jeep1Obj, jeep2Obj, jeep3Obj]
 jeepNum = 0
@@ -363,7 +363,7 @@ def display():
     jeepObj.drawW1()
     jeepObj.drawW2()
     jeepObj.drawLight()
-    trafficlightObj.draw()
+    #trafficlightObj.draw()
 
     deadtreeObj.draw()
 
@@ -819,9 +819,8 @@ def main():
         addCone(random.randint(-land, land), random.randint(10.0, land*gameEnlarge))
 
     for i in range(treeamount):#create cones randomly for obstacles, making sure to give a little lag time in beginning by adding 10.0 buffer
-        addDeadTree(random.choice([i for i in range(-land - 20, land + 20) if i not in range(-land, land)]), 0, random.choice([i for i in range(10 - 20, land * gameEnlarge + 20) if i not in range(10, land * gameEnlarge)]))
-    #random.choice(i for i in range(-land - 20, land + 20) if i not in range (-land, land))
-    #random.choice(i for i in range(10 - 20, land * gameEnlarge + 20) if i not in range (10.0, land * gameEnlarge))
+        addDeadTree(random.choice([i for i in range(-land - 20, land + 20) if i not in range(-land, land)]), 0, random.randint(-land, 500))
+    #random.choice([i for i in range(-200, 200) if i not in range(10, land * gameEnlarge)])
     # things to do
     # add stars
 
