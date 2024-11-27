@@ -69,7 +69,7 @@ land = 40
 gameEnlarge = 10
 
 #concerned with obstacles (cones) & rewards (stars)
-coneAmount = 150
+coneAmount = 15
 starAmount = 5 #val = -10 pts
 diamondAmount = 1 #val = deducts entire by 1/2
 # diamondObj = diamond.diamond(random.randint(-land, land), random.randint(10.0, land*gameEnlarge))
@@ -363,7 +363,7 @@ def display():
     jeepObj.drawW1()
     jeepObj.drawW2()
     jeepObj.drawLight()
-    #trafficlightObj.draw()
+    trafficlightObj.draw()
 
     deadtreeObj.draw()
 
@@ -430,12 +430,12 @@ def setObjView():
     # things to do
     # realize a view following the jeep
     # refer to setview
-    global eyeX, eyeY, eyeZ
+    global eyeX, eyeY, eyeZ ,tryme
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
     gluPerspective(90, 1, 0.1, 100)
     # Set camera to follow the jeep
-    gluLookAt(eyeX + jeepObj.posX, eyeY + jeepObj.posY, eyeZ + jeepObj.posZ, jeepObj.posX, jeepObj.posY, jeepObj.posZ, 0, 1, 0)
+    gluLookAt(jeepObj.posX, jeepObj.posY + 5, jeepObj.posZ - tryme,jeepObj.posX, jeepObj.posY, jeepObj.posZ, 0, 1, 0)
     glMatrixMode(GL_MODELVIEW)
     glutPostRedisplay()
 
@@ -488,7 +488,7 @@ def motionHandle(x,y):
 def specialKeys(keypress, mX, mY):
     # things to do
     # this is the function to move the car
-    global jeepObj
+    global jeepObj ,tryme
     move_speed = jeepObj.speed  # Use the jeep's current speed
 
     if keypress == GLUT_KEY_UP or keypress == b'w':  # Forward
@@ -811,6 +811,7 @@ def main():
     jeep2Obj.makeDisplayLists()
     jeep3Obj.makeDisplayLists()
     deadtreeObj.makeDisplayLists()
+    trafficlightObj.makeDisplayLists()
     #personObj.makeDisplayLists()
 
     # things to do
