@@ -5,7 +5,7 @@ from OpenGL.GLU import *
 import math, time, random, csv, datetime
 import ImportObject
 import PIL.Image as Image
-import jeep, cone, deadtree
+import jeep, cone, deadtree , trafficlight
 
 # List to hold all dead trees
 all_deadtrees = []
@@ -18,6 +18,7 @@ animation_active = False  # Is animation currently active?
 animation_start_time = 0  # When the animation started
 collision_position = (0, 0)  # Position of the collision
 animation_duration = 0.5  # Total duration of animation (in seconds)
+trafficlightObj = trafficlight.TrafficLight(0,15,30)
 
 windowSize = 600
 helpWindow = False
@@ -362,6 +363,7 @@ def display():
     jeepObj.drawW1()
     jeepObj.drawW2()
     jeepObj.drawLight()
+    trafficlightObj.draw()
 
     deadtreeObj.draw()
 
@@ -422,6 +424,7 @@ def setView():
 #     eyeX = jeepObj.posX + camera_distance * math.sin(camera_angle)
 #     eyeY = jeepObj.posY + camera_height
 #     eyeZ = jeepObj.posZ + camera_distance * math.cos(camera_angle) 
+tryme = 10
 
 def setObjView():
     # things to do
@@ -502,6 +505,10 @@ def specialKeys(keypress, mX, mY):
         jeepObj.posX -= move_speed
         jeepObj.wheelDir = 'fwd'
         # jeepObj.angle -= 5  # Adjust angle for right turn
+    elif keypress == b'q':  # zoom-in
+        tryme -= 0.5  
+    elif keypress == b'e':  # zoom-out
+        tryme += 0.5
 
     collisionCheck()  # Check for collisions after moving
     setObjView()  # Update the camera view
@@ -527,7 +534,7 @@ def myKeyboard(key, mX, mY):
             glutHideWindow()
             #glutDestroyWindow(helpWin)
             glutMainLoop()
-    elif key in [b'w', b'a', b's', b'd']:
+    elif key in [b'w', b'a', b's', b'd', b'q' , b'e']:
         specialKeys(key, mX, mY)  # Call specialKeys for WASD
     # things can do
     # this is the part to set special functions, such as help window.
