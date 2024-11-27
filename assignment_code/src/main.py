@@ -67,6 +67,7 @@ phi = 0.0
 #concerned with scene development
 land = 40
 gameEnlarge = 10
+roadTextureID2 = None
 
 #concerned with obstacles (cones) & rewards (stars)
 coneAmount = 15
@@ -114,6 +115,10 @@ class AcceleratingRibbon:
         self.length = length
 
     def draw(self):
+        glEnable(GL_TEXTURE_2D)
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+        glBindTexture(GL_TEXTURE_2D, roadTextureID2)
+
         glPushMatrix()
         glColor3f(1.0, 0.0, 0.0)  # Red color for the ribbon
         glBegin(GL_QUADS)
@@ -123,6 +128,7 @@ class AcceleratingRibbon:
         glVertex3f(self.x - self.width / 2, 0.01, self.z + self.length / 2)  # Top-left corner
         glEnd()
         glPopMatrix()
+        glDisable(GL_TEXTURE_2D)
 
     def is_jeep_on_ribbon(self, jeep_obj):
         # Check if the jeep's position is within the bounds of the ribbon
@@ -695,8 +701,9 @@ def loadTexture(imageName):
     return tempID
 
 def loadSceneTextures():
-    global roadTextureID
+    global roadTextureID , roadTextureID2
     roadTextureID = loadTexture("./img/road2.png")
+    roadTextureID2 = loadTexture("./img/old.png")
     
 #-----------------------------------------------lighting work--------------
 # Define light properties
