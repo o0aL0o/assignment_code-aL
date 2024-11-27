@@ -812,8 +812,11 @@ def main():
         addCone(random.randint(-land, land), random.randint(10.0, land*gameEnlarge))
 
     for i in range(treeamount):#create cones randomly for obstacles, making sure to give a little lag time in beginning by adding 10.0 buffer
-        addDeadTree(random.randint(-land - land, land + land), 0,random.randint(0, land * gameEnlarge))
-
+        addDeadTree(random.choice(i for i in range(-land - 20, land + 20) if i not in range (-land, land)), 
+                    0,
+                    random.choice(i for i in range(10 - 20, land * gameEnlarge + 20) if i not in range (10.0, land * gameEnlarge)))
+    #random.choice(i for i in range(-land - 20, land + 20) if i not in range (-land, land))
+    #random.choice(i for i in range(10 - 20, land * gameEnlarge + 20) if i not in range (10.0, land * gameEnlarge))
     # things to do
     # add stars
 
