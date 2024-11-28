@@ -706,30 +706,79 @@ def loadSceneTextures():
     roadTextureID2 = loadTexture("./img/old.png")
     
 #-----------------------------------------------lighting work--------------
-# Define light properties
-ambient_light = [0.2, 0.2, 0.2, 1.0]
-point_light_position = [1.0, 1.0, 1.0, 1.0]
-directional_light_direction = [0.0, -1.0, -1.0, 0.0]
-spot_light_position = [0.0, 5.0, 0.0, 1.0]
-spot_light_direction = [0.0, -1.0, 0.0]
 
 def set_ambient_light():
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light)
+
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT0)
     glDisable(GL_LIGHT1)
+    glDisable(GL_LIGHT2)
+    glDisable(GL_LIGHT3)
+
+    ambient_light = [0.3, 0.2, 0.2, 1.0]  
+    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light)
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, [0.7, 0.7, 0.7, 1.0])  
+    glLightfv(GL_LIGHT0, GL_SPECULAR, [0.0, 0.0, 0.0, 1.0])  
+
+    print("Ambient light enabled.")
 
 def set_point_light():
-    glLightfv(GL_LIGHT0, GL_POSITION, point_light_position)
+
+    glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT1)
+    glDisable(GL_LIGHT0)
+    glDisable(GL_LIGHT2)
+    glDisable(GL_LIGHT3)
+
+    point_light_position = [0.0, 10.0, 0.0, 1.0]  
+    point_light_diffuse = [1.0, 1.0, 1.0, 1.0]  
+    point_light_specular = [0.5, 0.5, 0.5, 1.0]  
+
+    glLightfv(GL_LIGHT1, GL_POSITION, point_light_position)
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, point_light_diffuse)
+    glLightfv(GL_LIGHT1, GL_SPECULAR, point_light_specular)
+
+    print("Point light enabled.")
 
 def set_directional_light():
-    glLightfv(GL_LIGHT0, GL_POSITION, directional_light_direction)
+
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT2)
     glDisable(GL_LIGHT1)
+    glDisable(GL_LIGHT0)
+    glDisable(GL_LIGHT3)
+
+    directional_light_direction = [0.0, 50.0, -1.0, 0.0]  
+    directional_light_diffuse = [1.0, 1.0, 1.0, 1.0]  
+    directional_light_specular = [0.5, 0.5, 0.5, 1.0]  
+
+    glLightfv(GL_LIGHT2, GL_POSITION, directional_light_direction)
+    glLightfv(GL_LIGHT2, GL_DIFFUSE, directional_light_diffuse)
+    glLightfv(GL_LIGHT2, GL_SPECULAR, directional_light_specular)
+
+    print("Directional light enabled.")
 
 def set_spot_light():
-    glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0)
-    glLightfv(GL_LIGHT0, GL_POSITION, spot_light_position)
-    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_light_direction)
-    glEnable(GL_LIGHT1)
+
+    glEnable(GL_LIGHTING)
+    glEnable(GL_LIGHT3)
+    glDisable(GL_LIGHT1)
+    glDisable(GL_LIGHT2)
+    glDisable(GL_LIGHT0)
+
+    spot_light_position = [0.0, 10.0, 0.0, 1.0]  
+    spot_light_direction = [0.0, -1.0, 0.0]  
+    spot_light_diffuse = [1.0, 1.0, 1.0, 1.0]  
+    spot_light_specular = [0.8, 0.8, 0.8, 1.0]  
+
+    glLightfv(GL_LIGHT3, GL_POSITION, spot_light_position)
+    glLightfv(GL_LIGHT3, GL_DIFFUSE, spot_light_diffuse)
+    glLightfv(GL_LIGHT3, GL_SPECULAR, spot_light_specular)
+    glLightfv(GL_LIGHT3, GL_SPOT_DIRECTION, spot_light_direction)
+    glLightf(GL_LIGHT3, GL_SPOT_CUTOFF, 45.0)  
+    glLightf(GL_LIGHT3, GL_SPOT_EXPONENT, 1.0)  
+
+    print("Spotlight enabled.")
 
 def set_resolution(width, height):
     glutReshapeWindow(width, height)
@@ -764,6 +813,7 @@ def lightmenu(value):
     elif value == 8:
         toggle_fullscreen()
     glutPostRedisplay()
+    return 0
 
 def initializeLight():
     glEnable(GL_LIGHTING)                
