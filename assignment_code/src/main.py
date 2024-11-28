@@ -441,7 +441,7 @@ def setObjView():
     glLoadIdentity()
     gluPerspective(90, 1, 0.1, 100)
     # Set camera to follow the jeep
-    gluLookAt(jeepObj.posX, jeepObj.posY + 5, jeepObj.posZ - tryme,jeepObj.posX, jeepObj.posY, jeepObj.posZ, 0, 1, 0)
+    gluLookAt(eyeX + jeepObj.posX, eyeY + jeepObj.posY + 5, eyeZ + jeepObj.posZ - tryme,jeepObj.posX, jeepObj.posY, jeepObj.posZ, 0, 1, 0)
     glMatrixMode(GL_MODELVIEW)
     glutPostRedisplay()
 
