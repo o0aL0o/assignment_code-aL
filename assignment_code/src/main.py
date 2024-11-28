@@ -5,7 +5,7 @@ from OpenGL.GLU import *
 import math, time, random, csv, datetime
 import ImportObject
 import PIL.Image as Image
-import jeep, cone, deadtree , trafficlight
+import jeep, cone, deadtree , trafficlight, star
 
 # List to hold all dead trees
 all_deadtrees = []
@@ -352,6 +352,8 @@ def display():
         obj.draw()
     for cone in allcones:
         cone.draw()
+    for star in allstars:
+        star.draw()
 
     for tree in all_deadtrees:
         tree.draw()
@@ -587,6 +589,10 @@ def addCone(x,z):
     allcones.append(cone.cone(x,z))
     obstacleCoord.append((x,z))
 
+def addStar(x,z):
+    allstars.append(star.star(x,z))
+    rewardCoord.append((x,z))
+
 def addDeadTree(x,y,z):
     all_deadtrees.append(deadtree.DeadTree(x,y,z))
 
@@ -600,6 +606,12 @@ def collisionCheck():
         overReason = "You ran off the road!"
         gameOver()
 
+    for reward in rewardCoord:
+        if dist((jeepObj.posX, jeepObj.posZ), reward) <= ckSense:
+            print ("Star bonus!")
+            allstars.pop(rewardCoord.index(reward))
+            rewardCoord.remove(reward)
+            countTime -= 10
     # if (dist((jeepObj.posX, jeepObj.posZ), (diamondObj.posX, diamondObj.posZ)) <= ckSense and usedDiamond ==False):
     #     print ("Diamond bonus!")
     #     countTime /= 2
@@ -881,6 +893,11 @@ def main():
     #random.choice([i for i in range(-200, 200) if i not in range(10, land * gameEnlarge)])
     # things to do
     # add stars
+    for i in range(starAmount):
+        addStar(random.randint(-land, land), random.randint(10.0, land*gameEnlarge))
+
+    for star in allstars:
+        star.makeDisplayLists()
 
     for cone in allcones:
         cone.makeDisplayLists()
