@@ -65,12 +65,12 @@ radius = 10.0
 phi = 0.0
 
 #concerned with scene development
-land = 40
+land = 30
 gameEnlarge = 10
 roadTextureID2 = None
 
 #concerned with obstacles (cones) & rewards (stars)
-coneAmount = 15
+coneAmount = 30
 starAmount = 5 #val = -10 pts
 diamondAmount = 1 #val = deducts entire by 1/2
 # diamondObj = diamond.diamond(random.randint(-land, land), random.randint(10.0, land*gameEnlarge))
@@ -137,7 +137,7 @@ class AcceleratingRibbon:
             self.z - self.length / 2 <= jeep_obj.posZ <= self.z + self.length / 2
         )
 
-ribbon = AcceleratingRibbon(0, 20, 100, 50)
+ribbon = AcceleratingRibbon(0, 50, 100, 50)
 
 class MovingCone:
     def __init__(self, x, z):
@@ -392,7 +392,7 @@ def idle():#--------------with more complex display items like turning wheel---
     if ribbon.is_jeep_on_ribbon(jeepObj):
         jeepObj.speed = 2.0  # Accelerate the jeep (you can adjust the speed value)
     else:
-        jeepObj.speed = 0.5  # Default speed
+        jeepObj.speed = 1.0  # Default speed
 
     # Update positions of moving cones
     update_cones()
